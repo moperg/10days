@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
 import { supabase } from '../lib/supabaseClient';
 
@@ -57,43 +56,7 @@ const isFutureDate = (date) => {
   return compareDate > today;
 };
 
-const getInitialStreaks = () => {
-  const initialStreaks = {};
-  Object.keys(USERS).forEach(user => {
-    if (user !== 'admin') {
-      initialStreaks[user] = Array(CHALLENGE_LENGTH).fill(false);
-    }
-  });
-  return initialStreaks;
-};
-
 // Custom hooks
-const useLocalStorage = (key, initialValue) => {
-  const [value, setValue] = useState(() => {
-    try {
-      const savedValue = localStorage.getItem(key);
-      return savedValue ? JSON.parse(savedValue) : initialValue;
-    } catch (error) {
-      console.error(`Kunde inte läsa ${key} från localStorage:`, error);
-      return initialValue;
-    }
-  });
-
-  useEffect(() => {
-    try {
-      if (value instanceof Date) {
-        localStorage.setItem(key, value.toISOString());
-      } else {
-        localStorage.setItem(key, JSON.stringify(value));
-      }
-    } catch (error) {
-      console.error(`Kunde inte spara ${key} i localStorage:`, error);
-    }
-  }, [key, value]);
-
-  return [value, setValue];
-};
-
 const useNotification = (duration = 3000) => {
   const [message, setMessage] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -232,14 +195,10 @@ const StreakTracker = () => {
   const [streaks, setStreaks] = useState({});
   const [goal, setGoal] = useState('');
   const [newGoal, setNewGoal] = useState('');
-  const [startDate, setStartDate] = useState(null);
   const [dates, setDates] = useState([]);
   const [history, setHistory] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [lastCompletedDay, setLastCompletedDay] = useState(null);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [showReward, setShowReward] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const dayRefs = useRef({});
 
@@ -265,7 +224,6 @@ const StreakTracker = () => {
 
       if (activeChallenge) {
         setGoal(activeChallenge.goal);
-        setStartDate(new Date(activeChallenge.start_date));
         setDates(calculateDates(new Date(activeChallenge.start_date)));
 
         // Hämta användarnas framsteg
@@ -405,7 +363,6 @@ const StreakTracker = () => {
 
       setGoal(newGoal.trim());
       setNewGoal('');
-      setStartDate(new Date());
       setDates(calculateDates(new Date()));
       setStreaks({});
       setIsCompleted(false);
@@ -492,12 +449,8 @@ const StreakTracker = () => {
     setStreaks({})
     setGoal('')
     setNewGoal('')
-    setStartDate(null)
     setDates([])
     setIsCompleted(false)
-    setShowConfetti(false)
-    setShowReward(false)
-    setLastCompletedDay(null)
   }
 
   if (!currentUser) {
