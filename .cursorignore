@@ -1,0 +1,15 @@
+# Ignorera node_modules
+node_modules/
+
+# Ignorera build-mappen
+build/
+
+# Ignorera .git-mappen
+.git/
+
+# Ignorera andra vanliga filer att ignorera
+.DS_Store
+*.log
+
+# Explicit INTE ignorera .env
+!.env 
